@@ -1,6 +1,5 @@
-$(document).ready(function() {
-console.log("ready!");
-// Dates
+
+// dates
 var startDate = moment().format('M/DD/YYYY');  // Current Date
 var day1 = moment().add(1, 'days').format('M/DD/YYYY');
 var day2 = moment().add(2, 'days').format('M/DD/YYYY');
@@ -8,27 +7,28 @@ var day3 = moment().add(3, 'days').format('M/DD/YYYY');
 var day4 = moment().add(4, 'days').format('M/DD/YYYY');
 var day5 = moment().add(5, 'days').format('M/DD/YYYY');
 
-
-
+$(document).ready(function () {
+    console.log("ready!");
 
 // On-click when user enters city 
 $("#basic-text1").on("click", function(event) {
   event.preventDefault();
 
-  var cityInput = $("#input").val(); //saves the city that has been entered
-  var allCities = []; // Array to hold all searched cities
+  // clears previous data to only show one city
+  $("#dailyWeather").empty();
+  $("#fiveDay").empty();
+  $("#day1").empty();
+  $("#day2").empty();
+  $("#day3").empty();
+  $("#day4").empty();
+  $("#day5").empty();
 
-  allCities = JSON.parse(localStorage.getItem("allCities")) || []; // Get cities
-  allCities.push(cityInput); // pushes new cities entered to array 
-  localStorage.setItem("allCities", JSON.stringify(allCities)); //saves city input to local storage 
+  var cityInput = $("#input").val(); //saves entered city
+  var allCities = []; // searched cities array
 
-  // Append List of Cities to Web Page 
-  $("#cityButtons").append (
-    //styling 
-    "<div class='list-group'>"
-  // City text
-  + "<a href='#' class='list-group-item'>" + cityInput + "</a>"
-  + "</div>")
+  allCities = JSON.parse(localStorage.getItem("allCities")) || [];
+  allCities.push(cityInput); // pushes new cities to array 
+  localStorage.setItem("allCities", JSON.stringify(allCities)); //saves city to local storage 
 
   // QueryURL to Open Weather App for One Day 
   var oneDay ="https://api.openweathermap.org/data/2.5/weather?q=" 
@@ -70,14 +70,14 @@ $("#basic-text1").on("click", function(event) {
       var iconUrl4 = "http://openweathermap.org/img/w/" + response.daily[3].weather[0].icon + ".png";
       var iconUrl5 = "http://openweathermap.org/img/w/" + response.daily[4].weather[0].icon + ".png";
 
-      // Adding in UV Index to daily weather 
+      // UV Index 
       $("#dailyWeather").append(
         "<div class='col s12 m6'>"
        + "<button class='w3-button' id='uvIndex' class='daily'>" + "UV Index: " + response.current.uvi + "</button>"
        + "</div>"
-       ); // End of append 
+       ); 
 
-      // UV Index colors 
+      // UV Index Colors 
       if (response.current.uvi <= 2) {
         $("#uvIndex").addClass("green");
        } else if (response.current.uvi <= 5) {
@@ -89,11 +89,13 @@ $("#basic-text1").on("click", function(event) {
        } else if (response.current.uvi <= 40) {
            $("#uvIndex").addClass("purple");
        };
+
       // HEADER
       $("#fiveDay").append(
         "<div class='col-md-12'>"
        + "<h2 id='fiveDay'>" + "5-Day Forecast:" + "</h2>" 
-      ); // End of append 
+      );  
+
        // DAY ONE DETAILS
       $("#day1").append(
        "<div class='fiveDayCard card col s12 m6'>"
@@ -103,7 +105,8 @@ $("#basic-text1").on("click", function(event) {
        +  "<div class='card-text'>" + "Temp: " + response.daily[0].temp.day + " °F" + "</div>"
        +  "<div class='card-text'>" + "Humidity: " + response.daily[0].humidity + "%" + "</div>" 
        + "</div>" 
-      ); // End of append 
+      ); 
+
       //DAY TWO DETAILS
       $("#day2").append(
         "<div class='fiveDayCard card col s12 m6'>"
@@ -113,7 +116,8 @@ $("#basic-text1").on("click", function(event) {
         +  "<div class='card-text'>" + "Temp: " + response.daily[1].temp.day + " °F" + "</div>"
         +  "<div class='card-text'>" + "Humidity: " + response.daily[1].humidity + "%" + "</div>" 
         + "</div>" 
-      ); // End of append 
+      ); 
+       
       //DAY THREE DETAILS
       $("#day3").append(
         "<div class='fiveDayCard card col s12 m6'>"
@@ -123,7 +127,8 @@ $("#basic-text1").on("click", function(event) {
         +  "<div class='card-text'>" + "Temp: " + response.daily[2].temp.day + " °F" + "</div>"
         +  "<div class='card-text'>" + "Humidity: " + response.daily[2].humidity + "%" + "</div>" 
         + "</div>" 
-      ); // End of append 
+      ); 
+       
       //DAY FOUR DETAILS
       $("#day4").append(
         "<div class='fiveDayCard card col s12 m6'>"
@@ -133,7 +138,8 @@ $("#basic-text1").on("click", function(event) {
         +  "<div class='card-text'>" + "Temp: " + response.daily[3].temp.day + " °F" + "</div>"
         +  "<div class='card-text'>" + "Humidity: " + response.daily[3].humidity + "%" + "</div>" 
         + "</div>" 
-      ); // End of append 
+      ); 
+       
       //DAY FIVE DETAILS
       $("#day5").append(
         "<div class='fiveDayCard card col s12 m6'>"
@@ -143,9 +149,34 @@ $("#basic-text1").on("click", function(event) {
         +  "<div class='card-text'>" + "Temp: " + response.daily[4].temp.day + " °F" + "</div>"
         +  "<div class='card-text'>" + "Humidity: " + response.daily[4].humidity + "%" + "</div>" 
         + "</div>" 
-      ); // End of append 
+      );  
+
+      showCities(); 
         
-      }) // End of ajax then response  
-    }) // End of ajax then response 
-  }); // End of city button on-click
+      })  
+    }) 
+  }); 
+
+    //  get city array from local storage 
+    function showCities() {
+        $("#cityButtons").empty(); // clears previous array 
+        var arrayFromStorage = JSON.parse(localStorage.getItem("allCities")); 
+        var arrayLength = arrayFromStorage.length; 
+
+        for (var i = 0; i < arrayLength; i++) {
+            var cityNameFromArray = arrayFromStorage[i];
+
+            $("#cityButtons").append(
+                //styling 
+                "<div class='list-group'>"
+
+                // City text
+                +
+                "<button class='list-group-item'>" + cityNameFromArray +
+                "</button>")
+        } // end of loop 
+    } 
+
+    showCities(); // calls function to append cities upon page load 
+
 }); // end of document ready function
