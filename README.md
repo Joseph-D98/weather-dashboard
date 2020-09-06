@@ -15,4 +15,4 @@ Purple: > 10
 
 Deployed URL: https://joseph-d98.github.io/weather-dashboard/
 
-![](assets/images/readMe.PNG)
+![](assets/images/readMe.png)
